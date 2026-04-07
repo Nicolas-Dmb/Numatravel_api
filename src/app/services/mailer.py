@@ -46,6 +46,7 @@ def send_email_to_admin(form_data: Contact) -> None:
         f"Nom : {form_data.first_name} {form_data.last_name}\n"
         f"Email : {form_data.email}\n"
         f"Message : {form_data.message}\n"
+        f"Phone : {form_data.phone if form_data.phone else 'N/A'}"
     )
 
     msg_admin = MIMEText(body_admin)
