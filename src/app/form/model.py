@@ -1,11 +1,11 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Contact(BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    message: str
-    phone: Optional[str] = None
+    first_name: str = Field(alias="firstName")
+    last_name: str = Field(alias="lastName")
+    email: str = Field(alias="email")
+    message: str = Field(alias="message")
+    phone: Optional[str] = Field(default=None, alias="phone")

@@ -19,5 +19,5 @@ def submit_contact_form(form_data: Contact) -> JSONResponse:
     logging.info(f"Contact form submitted successfully for {form_data.email}")
     return JSONResponse(
         content={"message": "Form submitted successfully"},
-        status_code=200,
+        status_code=201,
     )

@@ -19,7 +19,7 @@ body = (
     "Que ce soit pour une question, une envie de voyage ou simplement en savoir plus, "
     "je serai ravie d’échanger avec vous.\n\n"
     "À très bientôt,\n"
-    "Aloïs – Numatravel ✈️"
+    "Aloïs – Numa Travel ✈️"
 )
 
 
