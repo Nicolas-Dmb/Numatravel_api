@@ -1,3 +1,5 @@
+import logging
+
 from config import check_authentication
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
@@ -10,4 +12,5 @@ router = APIRouter()
 async def submit_form(
     form_data: Contact, auth: None = Depends(check_authentication)
 ) -> JSONResponse:
+    logging.info(f"Received contact form submission from {form_data.email}")
     return submit_contact_form(form_data)
