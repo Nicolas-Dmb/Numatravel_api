@@ -24,7 +24,7 @@ jobs:
 
       - name: Sync project to VPS
         run: |
-          rsync -az --delete \
+          rsync -rlvz --delete --omit-dir-times --no-times \
             --exclude ".git" \
             --exclude ".github" \
             --exclude ".venv" \
