@@ -1,0 +1,46 @@
+name: Deploy FastAPI to VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Sync project to VPS
+        run: |
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude ".venv" \
+            --exclude "__pycache__" \
+            -e "ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519" \
+            ./ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/projects/numa-travel/api/
+
+      - name: Install dependencies and restart service
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+              set -e
+              mkdir -p /projects/numa-travel/api
+              cd /projects/numa-travel/api
+              ~/.local/bin/uv sync --no-dev
+              sudo systemctl daemon-reload
+              sudo systemctl restart numatravel-api
+              sudo systemctl enable numatravel-api
+              sudo systemctl status numatravel-api --no-pager
+          EOF

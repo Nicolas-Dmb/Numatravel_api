@@ -1,3 +1,5 @@
+import os
+
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,17 +14,10 @@ bearer_scheme = HTTPBearer()
 limiter = Limiter(key_func=get_remote_address)
 
 
-origins = [
-    "http://localhost:5173",
-    "https://numatravelplan.com",
-    "https://www.numatravelplan.com",
-]
-
-
 def setup_cors(app: FastAPI) -> None:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=os.environ.get("CORS_ORIGINS", "").split(","),
         allow_credentials=False,
         allow_methods=["POST"],
         allow_headers=["Content-Type", "Authorization"],
