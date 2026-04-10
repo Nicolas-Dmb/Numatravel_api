@@ -1,9 +1,10 @@
 import logging
 
-from config import limiter
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from form import Contact, submit_contact_form
+
+from .config import limiter
+from .form import Contact, submit_contact_form
 
 router = APIRouter()
 

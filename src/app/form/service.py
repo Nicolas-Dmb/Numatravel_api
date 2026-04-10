@@ -1,9 +1,9 @@
 import logging
 
 from fastapi.responses import JSONResponse
-from services import confirmation_email, send_email_to_admin
 
-from form import Contact
+from ..services import confirmation_email, send_email_to_admin
+from .model import Contact
 
 
 def submit_contact_form(form_data: Contact) -> JSONResponse:

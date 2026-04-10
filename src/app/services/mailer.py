@@ -3,7 +3,8 @@ import smtplib
 from email.mime.text import MIMEText
 
 from dotenv import find_dotenv, load_dotenv
-from form import Contact
+
+from ..form import Contact
 
 load_dotenv(find_dotenv())
 
