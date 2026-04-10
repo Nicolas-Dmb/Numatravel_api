@@ -15,10 +15,16 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def setup_cors(app: FastAPI) -> None:
+    origins = [
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=os.environ.get("CORS_ORIGINS", "").split(","),
+        allow_origins=origins,
         allow_credentials=False,
-        allow_methods=["POST"],
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],
     )
