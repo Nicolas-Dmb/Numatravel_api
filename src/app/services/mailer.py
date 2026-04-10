@@ -44,7 +44,8 @@ def send_email_to_admin(form_data: Contact) -> None:
     subject_admin = "Nouveau message de contact reçu"
     body_admin = (
         f"Vous avez reçu un nouveau message de contact :\n\n"
-        f"Nom : {form_data.first_name} Prénom : {form_data.last_name}\n"
+        f"Nom : {form_data.last_name}\n"
+        f"Prénom : {form_data.first_name}\n"
         f"Email : {form_data.email}\n"
         f"Message : {form_data.message}\n"
         f"Phone : {form_data.phone if form_data.phone else 'N/A'}"
