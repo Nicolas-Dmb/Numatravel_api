@@ -9,7 +9,6 @@ from .router import router
 
 logging.basicConfig(level=logging.INFO)
 logging.info("Starting the application...")
-logging.error("This is a test error log to verify logging configuration.")
 
 app = FastAPI()
 app.state.limiter = limiter
