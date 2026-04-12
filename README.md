@@ -7,7 +7,7 @@ A project created with FastAPI CLI.
 ### Start the development server
 
 ```bash
-uv run fastapi dev
+ uv run uvicorn src.app.main:app
 ```
 
 Visit http://localhost:8000
