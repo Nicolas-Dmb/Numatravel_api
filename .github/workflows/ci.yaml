@@ -38,15 +38,15 @@ jobs:
         run: |
           ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519 \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-              set -e
-              mkdir -p /projects/numa-travel/api
-              cd /projects/numa-travel/api
+                set -e
+                mkdir -p /projects/numa-travel/api
+                cd /projects/numa-travel/api
 
-              sudo rm -rf .venv
-              ~/.local/bin/uv sync --no-dev
+                rm -rf .venv
+                ~/.local/bin/uv sync --no-dev
 
-              sudo systemctl daemon-reload
-              sudo systemctl restart numatravel-api
-              sudo systemctl enable numatravel-api
-              sudo systemctl status numatravel-api --no-pager
+                sudo systemctl daemon-reload
+                sudo systemctl restart numatravel-api
+                sudo systemctl enable numatravel-api
+                sudo systemctl status numatravel-api --no-pager
           EOF
