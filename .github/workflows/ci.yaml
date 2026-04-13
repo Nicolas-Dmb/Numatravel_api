@@ -41,7 +41,10 @@ jobs:
               set -e
               mkdir -p /projects/numa-travel/api
               cd /projects/numa-travel/api
+
+              rm -rf .venv
               ~/.local/bin/uv sync --no-dev
+
               sudo systemctl daemon-reload
               sudo systemctl restart numatravel-api
               sudo systemctl enable numatravel-api
