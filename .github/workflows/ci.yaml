@@ -42,7 +42,7 @@ jobs:
               mkdir -p /projects/numa-travel/api
               cd /projects/numa-travel/api
 
-              rm -rf .venv
+              sudo rm -rf .venv
               ~/.local/bin/uv sync --no-dev
 
               sudo systemctl daemon-reload
