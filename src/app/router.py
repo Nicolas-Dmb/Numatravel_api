@@ -30,8 +30,6 @@ async def submit_form(request: Request, form_data: Contact) -> JSONResponse:
     client_ip = get_client_ip(request)
     user_agent = request.headers.get("user-agent")
 
-    logging.info(f"Client IP: {client_ip}, User Agent: {user_agent}")
-
     return submit_contact_form(form_data, client_ip, user_agent)
 
 
