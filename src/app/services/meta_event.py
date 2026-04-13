@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import time
+from typing import Optional
 
 import requests
 from dotenv import find_dotenv, load_dotenv
@@ -22,7 +23,9 @@ def _sha256(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
-def send_meta_lead(contact: Contact):
+def send_meta_lead(
+    contact: Contact, client_ip: Optional[str], user_agent: Optional[str]
+) -> None:
     url = f"https://graph.facebook.com/v19.0/{os.getenv('META_PIXEL_ID')}/events"
 
     user_data = {
@@ -30,6 +33,18 @@ def send_meta_lead(contact: Contact):
         "fn": _sha256(contact.first_name.strip().lower()),
         "ln": _sha256(contact.last_name.strip().lower()),
     }
+
+    if client_ip:
+        user_data["client_ip_address"] = client_ip
+
+    if user_agent:
+        user_data["client_user_agent"] = user_agent
+
+    if contact.fbp:
+        user_data["fbp"] = contact.fbp
+
+    if contact.fbc:
+        user_data["fbc"] = contact.fbc
 
     if contact.phone:
         normalized_phone = _normalize_phone(contact.phone)

@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from fastapi.responses import JSONResponse
 
@@ -6,7 +7,9 @@ from ..services import confirmation_email, send_email_to_admin, send_meta_lead
 from .model import Contact
 
 
-def submit_contact_form(form_data: Contact) -> JSONResponse:
+def submit_contact_form(
+    form_data: Contact, client_ip: Optional[str], user_agent: Optional[str]
+) -> JSONResponse:
     try:
         send_email_to_admin(form_data)
         confirmation_email(form_data.first_name, form_data.email)
@@ -19,7 +22,7 @@ def submit_contact_form(form_data: Contact) -> JSONResponse:
 
     if form_data.meta_event_id:
         try:
-            send_meta_lead(form_data)
+            send_meta_lead(form_data, client_ip, user_agent)
         except Exception as e:
             logging.error(f"Failed to send meta lead for {form_data.email}: {e}")
 

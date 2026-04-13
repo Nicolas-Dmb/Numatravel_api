@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+from typing import Optional
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -13,11 +14,25 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+def get_client_ip(request: Request) -> Optional[str]:
+    x_forwarded_for = request.headers.get("x-forwarded-for")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+
+    return request.client.host if request.client else None
+
+
 @router.post("/submit_form")
 @limiter.limit("5/minute")
 async def submit_form(request: Request, form_data: Contact) -> JSONResponse:
     logging.info(f"Received contact form submission from {form_data.email}")
-    return submit_contact_form(form_data)
+
+    client_ip = get_client_ip(request)
+    user_agent = request.headers.get("user-agent")
+
+    logging.info(f"Client IP: {client_ip}, User Agent: {user_agent}")
+
+    return submit_contact_form(form_data, client_ip, user_agent)
 
 
 @router.post("/client-error")
