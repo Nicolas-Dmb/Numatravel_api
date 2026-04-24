@@ -45,7 +45,7 @@ def client_error(request: Request, payload: ClientError):
         logger.warning("DISCORD_SCRIPT_PATH is not set")
         return {"ok": True}
 
-    details = f"{payload.message}\nURL: {payload.url or 'N/A'}\nRoute: {route}\nCookies: {payload.hasCookieConsent or 'N/A'}\nReferrer: {payload.referrer or 'N/A'} \n User Agent: {user_agent or 'N/A'}"
+    details = f"{payload.message} - URL: {payload.url or 'N/A'} - Route: {route}\nCookies: {payload.hasCookieConsent or 'N/A'} - Referrer: {payload.referrer or 'N/A'} - User Agent: {user_agent or 'N/A'}"
     if payload.stack:
         details += f"\nStack: {payload.stack[:300]}"
 
@@ -61,8 +61,6 @@ def client_error(request: Request, payload: ClientError):
         )
     except Exception:
         logger.exception("Failed to send Discord alert")
-        logger.error(
-            f"[FRONT][{route}] {payload.message} | url={payload.url} | cookies={payload.hasCookieConsent} | referrer={payload.referrer} | ua={user_agent}"
-        )
+        logger.error(f"[FRONT][{route}] details: {details}")
 
     return {"ok": True}
