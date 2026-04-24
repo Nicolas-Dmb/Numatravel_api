@@ -34,9 +34,10 @@ async def submit_form(request: Request, form_data: Contact) -> JSONResponse:
 
 
 @router.post("/client-error")
-def client_error(payload: ClientError):
+def client_error(request: Request, payload: ClientError):
     """Endpoint to receive client-side error reports from the frontend."""
-    logger.error(f"[FRONT] {payload.message}")
+    route = "meta" if payload.isMetaRoute else "organic"
+    user_agent = request.headers.get("user-agent")
 
     discord_script_path = os.environ.get("DISCORD_SCRIPT_PATH")
 
@@ -44,17 +45,24 @@ def client_error(payload: ClientError):
         logger.warning("DISCORD_SCRIPT_PATH is not set")
         return {"ok": True}
 
+    details = f"{payload.message}\nURL: {payload.url or 'N/A'}\nRoute: {route}\nCookies: {payload.hasCookieConsent or 'N/A'}\nReferrer: {payload.referrer or 'N/A'} \n User Agent: {user_agent or 'N/A'}"
+    if payload.stack:
+        details += f"\nStack: {payload.stack[:300]}"
+
     try:
         subprocess.run(
             [
                 discord_script_path,
                 "FRONT",
                 "ERROR",
-                payload.message,
+                details,
             ],
             check=False,
         )
     except Exception:
         logger.exception("Failed to send Discord alert")
+        logger.error(
+            f"[FRONT][{route}] {payload.message} | url={payload.url} | cookies={payload.hasCookieConsent} | referrer={payload.referrer} | ua={user_agent}"
+        )
 
     return {"ok": True}
