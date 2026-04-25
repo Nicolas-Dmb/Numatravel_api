@@ -35,10 +35,8 @@ async def submit_form(request: Request, form_data: Contact) -> JSONResponse:
 
 @router.post("/client-error")
 def client_error(request: Request, payload: ClientError):
-    """Endpoint to receive client-side error reports from the frontend."""
     route = "meta" if payload.isMetaRoute else "organic"
-    user_agent = request.headers.get("user-agent")
-
+    user_agent = request.headers.get("user-agent", "N/A")
     discord_script_path = os.environ.get("DISCORD_SCRIPT_PATH")
 
     if not discord_script_path:
@@ -50,43 +48,25 @@ def client_error(request: Request, payload: ClientError):
     )
 
     details = (
-        f"{payload.message} - URL: {payload.url or 'N/A'} - Route: {route}\n"
-        f"Cookies: {cookies} - Referrer: {payload.referrer or 'N/A'} "
-        f"- User Agent: {user_agent or 'N/A'}"
+        f"{payload.message} | "
+        f"URL: {payload.url or 'N/A'} | "
+        f"Route: {route} | "
+        f"Cookies: {cookies} | "
+        f"Referrer: {payload.referrer or 'N/A'} | "
+        f"User Agent: {user_agent}"
     )
 
     if payload.stack:
-        details += f"\nStack: {payload.stack[:300]}"
+        details += f" | Stack: {payload.stack[:300]}"
+
+    details = details.replace("\n", " ").replace("\r", " ")[:1500]
 
     try:
-        result = subprocess.run(
-            [
-                discord_script_path,
-                "FRONT",
-                "ERROR",
-                details,
-            ],
-            capture_output=True,
-            text=True,
+        subprocess.run(
+            [discord_script_path, "FRONT", "ERROR", details],
             timeout=10,
-            check=False,
+            check=True,
         )
-
-        # if result.returncode != 0:
-        logger.error(
-            "[FRONT][%s] Discord script failed with code %s | stdout=%s | stderr=%s",
-            route,
-            result.returncode,
-            result.stdout,
-            result.stderr,
-        )
-        # else:
-        #     logger.info("[FRONT][%s] Discord alert sent successfully", route)
-
-    except subprocess.TimeoutExpired:
-        logger.exception("[FRONT][%s] Discord script timeout", route)
-        logger.error("[FRONT][%s] details: %s", route, details)
-
     except Exception:
         logger.exception("[FRONT][%s] Failed to send Discord alert", route)
         logger.error("[FRONT][%s] details: %s", route, details)
