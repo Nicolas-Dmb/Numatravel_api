@@ -72,16 +72,16 @@ def client_error(request: Request, payload: ClientError):
             check=False,
         )
 
-        if result.returncode != 0:
-            logger.error(
-                "[FRONT][%s] Discord script failed with code %s | stdout=%s | stderr=%s",
-                route,
-                result.returncode,
-                result.stdout,
-                result.stderr,
-            )
-        else:
-            logger.info("[FRONT][%s] Discord alert sent successfully", route)
+        # if result.returncode != 0:
+        logger.error(
+            "[FRONT][%s] Discord script failed with code %s | stdout=%s | stderr=%s",
+            route,
+            result.returncode,
+            result.stdout,
+            result.stderr,
+        )
+        # else:
+        #     logger.info("[FRONT][%s] Discord alert sent successfully", route)
 
     except subprocess.TimeoutExpired:
         logger.exception("[FRONT][%s] Discord script timeout", route)
