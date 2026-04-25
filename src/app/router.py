@@ -45,22 +45,50 @@ def client_error(request: Request, payload: ClientError):
         logger.warning("DISCORD_SCRIPT_PATH is not set")
         return {"ok": True}
 
-    details = f"{payload.message} - URL: {payload.url or 'N/A'} - Route: {route}\nCookies: {payload.hasCookieConsent or 'N/A'} - Referrer: {payload.referrer or 'N/A'} - User Agent: {user_agent or 'N/A'}"
+    cookies = (
+        payload.hasCookieConsent if payload.hasCookieConsent is not None else "N/A"
+    )
+
+    details = (
+        f"{payload.message} - URL: {payload.url or 'N/A'} - Route: {route}\n"
+        f"Cookies: {cookies} - Referrer: {payload.referrer or 'N/A'} "
+        f"- User Agent: {user_agent or 'N/A'}"
+    )
+
     if payload.stack:
         details += f"\nStack: {payload.stack[:300]}"
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             [
                 discord_script_path,
                 "FRONT",
                 "ERROR",
                 details,
             ],
+            capture_output=True,
+            text=True,
+            timeout=10,
             check=False,
         )
+
+        if result.returncode != 0:
+            logger.error(
+                "[FRONT][%s] Discord script failed with code %s | stdout=%s | stderr=%s",
+                route,
+                result.returncode,
+                result.stdout,
+                result.stderr,
+            )
+        else:
+            logger.info("[FRONT][%s] Discord alert sent successfully", route)
+
+    except subprocess.TimeoutExpired:
+        logger.exception("[FRONT][%s] Discord script timeout", route)
+        logger.error("[FRONT][%s] details: %s", route, details)
+
     except Exception:
-        logger.exception("Failed to send Discord alert")
-        logger.error(f"[FRONT][{route}] details: {details}")
+        logger.exception("[FRONT][%s] Failed to send Discord alert", route)
+        logger.error("[FRONT][%s] details: %s", route, details)
 
     return {"ok": True}
